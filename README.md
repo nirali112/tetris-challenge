@@ -1,6 +1,6 @@
 # Tetris Game
 
-A classic Tetris implementation built with Angular and TypeScript for a coding challenge.
+A Tetris implementation built with Angular and TypeScript for a coding challenge.
 
 ## How to Run
 
@@ -13,45 +13,49 @@ Open `http://localhost:4200` in your browser.
 
 ## Game Controls
 
-- **Arrow Keys**: Move and rotate pieces
+- **Arrow Keys**: Move pieces
   - Left/Right: Move piece horizontally  
-  - Up: Rotate piece
   - Down: Soft drop (faster fall)
-- **Spacebar**: Hard drop (instant drop)
 - **Pause/Resume**: Control game state
-- **Reset**: Start new game
+- **New Game**: Reset and restart
 
 ## Features
 
-- Classic Tetris gameplay with all 7 tetrominoes
-- Line clearing with scoring system
-- Next piece preview
+- Basic Tetris gameplay with 4 piece types (I, O, T, S)
+- Line clearing with proper Tetris scoring system
 - Pause/resume functionality
-- Responsive game board
+- Game over detection
+- Real-time collision detection
 
 ## Technical Details
 
 - **Framework**: Angular (standalone components)
 - **Language**: TypeScript
-- **Styling**: CSS with flexbox layout
-- **Game Logic**: Custom implementation with collision detection and piece rotation
+- **Styling**: CSS with grid layout
+- **Game Logic**: Custom implementation with collision detection
 
 ## Game Mechanics
 
-- **Scoring**: 100 points per cleared line × current level
-- **Leveling**: Every 10 lines cleared increases level
-- **Speed**: Game speed increases with each level
+- **Scoring**: 
+  - 1 line: 40 points
+  - 2 lines: 100 points
+  - 3 lines: 300 points
+  - 4 lines: 1200 points (Tetris!)
 - **Game Over**: When pieces reach the top of the board
 
 ## Development Notes
 
-Focused on core gameplay mechanics and clean code structure rather than advanced features.
+- **Working features**: Piece movement, collision detection, line clearing, scoring
+- **Strategic cuts**: No piece rotation, fixed game speed, limited piece variety
+- **Code approach**: Inline templates for faster development
 
 ## Architecture
 
-The game uses a single component approach with:
+Single component approach with:
 - Game state management in component properties
 - Keyboard event handling with Angular HostListener
 - Interval-based game loop for piece dropping
-- Matrix operations for piece rotation
-- Collision detection for movement validation
+- Simple collision detection for movement validation
+
+
+Built to demonstrate core programming concepts and Angular/TypeScript skills within a realistic timeframe.

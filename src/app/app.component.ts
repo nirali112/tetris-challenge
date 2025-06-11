@@ -6,188 +6,89 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="container">
-      <h1>Tetris</h1>
+    <div class="game">
+      <h1>Tetris Game</h1>
 
-      <div class="stats">
+      <div class="info">
         <span>Score: {{score}}</span>
-        <span>Level: {{level}}</span>
-        <span>Lines: {{linesCleared}}</span>
+        <span>Lines: {{lines}}</span>
+        <span>Piece: {{currentPiece ? 'Active' : 'None'}}</span>
       </div>
 
-      <div class="game-area">
-        <div class="board" #gameBoard>
-          <div *ngFor="let row of grid; let y = index" class="row">
-            <div *ngFor="let cell of row; let x = index"
-                 class="cell"
-                 [style.background]="cell || '#222'">
-            </div>
+      <div class="board">
+        <div *ngFor="let row of getBoardWithPiece(); let y = index" class="row">
+          <div *ngFor="let cell of row; let x = index"
+               class="cell"
+               [style.background-color]="cell || '#333'">
           </div>
-
-          <!-- Active piece -->
-          <div *ngIf="activePiece" class="piece">
-            <div *ngFor="let row of activePiece.blocks; let dy = index"
-                 class="piece-row"
-                 [style.top.px]="(activePiece.y + dy) * 25"
-                 [style.left.px]="activePiece.x * 25">
-              <div *ngFor="let block of row; let dx = index"
-                   class="block"
-                   [style.background]="block ? activePiece.color : 'transparent'"
-                   [style.left.px]="dx * 25">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="sidebar">
-          <div class="next-box">
-            <h3>Next</h3>
-            <div class="preview" *ngIf="nextPiece">
-              <div *ngFor="let row of nextPiece.blocks" class="mini-row">
-                <div *ngFor="let block of row"
-                     class="mini-block"
-                     [style.background]="block ? nextPiece.color : 'transparent'">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="controls-info">
-            <p>← → Move</p>
-            <p>↓ Drop</p>
-            <p>↑ Rotate</p>
-            <p>Space: Hard Drop</p>
-          </div>
-
-          <button (click)="pauseToggle()">{{paused ? 'Resume' : 'Pause'}}</button>
-          <button (click)="restart()">New Game</button>
         </div>
       </div>
 
-      <div *ngIf="gameEnded" class="game-over">
-        <h2>Game Over</h2>
-        <p>Score: {{score}}</p>
+      <div class="controls">
+        <p>Arrow keys to move, Down to drop faster</p>
+        <button (click)="togglePause()">{{paused ? 'Resume' : 'Pause'}}</button>
+        <button (click)="restart()">New Game</button>
+      </div>
+
+      <div *ngIf="gameOver" class="overlay">
+        <h2>Game Over!</h2>
+        <p>Final Score: {{score}}</p>
         <button (click)="restart()">Try Again</button>
       </div>
     </div>
   `,
   styles: [`
-    .container {
-      font-family: monospace;
+    .game {
       text-align: center;
-      background: #111;
-      color: #fff;
-      min-height: 100vh;
       padding: 20px;
+      background: #222;
+      color: white;
+      min-height: 100vh;
+      font-family: Arial;
     }
 
-    h1 { color: #0f0; margin-bottom: 20px; }
-
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin-bottom: 20px;
+    .info {
+      margin: 20px;
     }
 
-    .stats span {
-      background: #333;
-      padding: 8px 16px;
-      border-radius: 4px;
-    }
-
-    .game-area {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      align-items: flex-start;
+    .info span {
+      margin: 0 20px;
+      font-size: 18px;
     }
 
     .board {
-      position: relative;
-      border: 2px solid #0f0;
+      display: inline-block;
+      border: 3px solid #555;
+      margin: 20px;
       background: #000;
     }
 
-    .row { display: flex; }
+    .row {
+      display: flex;
+    }
 
     .cell {
       width: 25px;
       height: 25px;
-      border: 1px solid #333;
-      box-sizing: border-box;
+      border: 1px solid #444;
     }
 
-    .piece {
-      position: absolute;
-      top: 0;
-      left: 0;
-      pointer-events: none;
+    .controls {
+      margin: 20px;
     }
 
-    .piece-row {
-      position: absolute;
-      display: flex;
+    .controls p {
+      margin: 10px;
     }
-
-    .block {
-      position: absolute;
-      width: 25px;
-      height: 25px;
-      border: 1px solid #555;
-      box-sizing: border-box;
-    }
-
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      min-width: 150px;
-    }
-
-    .next-box {
-      background: #333;
-      padding: 15px;
-      border-radius: 8px;
-    }
-
-    .preview {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    .mini-row { display: flex; }
-
-    .mini-block {
-      width: 15px;
-      height: 15px;
-      border: 1px solid #555;
-    }
-
-    .controls-info {
-      background: #333;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    .controls-info p { margin: 5px 0; }
 
     button {
-      padding: 10px 20px;
-      background: #0f0;
-      color: #000;
-      border: none;
-      border-radius: 4px;
+      padding: 8px 16px;
+      margin: 5px;
+      font-size: 14px;
       cursor: pointer;
-      font-weight: bold;
     }
 
-    button:hover { background: #0a0; }
-
-    .game-over {
+    .overlay {
       position: fixed;
       top: 50%;
       left: 50%;
@@ -195,179 +96,121 @@ import { CommonModule } from '@angular/common';
       background: #000;
       border: 2px solid #f00;
       padding: 30px;
-      border-radius: 8px;
+      border-radius: 5px;
     }
   `]
 })
 export class AppComponent implements OnInit, OnDestroy {
-  // Game state
-  grid: string[][] = [];
-  activePiece: any = null;
-  nextPiece: any = null;
+  board: (string | null)[][] = [];
+  currentPiece: any = null;
   score = 0;
-  level = 1;
-  linesCleared = 0;
+  lines = 0;
   paused = false;
-  gameEnded = false;
+  gameOver = false;
+  gameInterval: any;
 
-  // Game config
-  boardW = 10;
-  boardH = 20;
-  dropInterval: any;
-  dropSpeed = 1000;
-
-  // Piece definitions - simple shapes
   pieces = [
-    { blocks: [[1,1,1,1]], color: '#0ff' }, // I
-    { blocks: [[1,1],[1,1]], color: '#ff0' }, // O
-    { blocks: [[0,1,0],[1,1,1]], color: '#f0f' }, // T
-    { blocks: [[0,1,1],[1,1,0]], color: '#0f0' }, // S
-    { blocks: [[1,1,0],[0,1,1]], color: '#f00' }, // Z
-    { blocks: [[1,0,0],[1,1,1]], color: '#00f' }, // J
-    { blocks: [[0,0,1],[1,1,1]], color: '#fa0' }  // L
+    { blocks: [[1,1,1,1]], color: '#00ffff' }, // I piece (horizontal only)
+    { blocks: [[1,1],[1,1]], color: '#ffff00' }, // Square
+    { blocks: [[1,1,1],[0,1,0]], color: '#ff00ff' }, // T piece (one orientation)
+    { blocks: [[1,1,0],[0,1,1]], color: '#00ff00' } // S piece (one orientation)
   ];
 
   ngOnInit() {
-    this.setupBoard();
-    this.spawnNewPiece();
-    this.startGameLoop();
+    this.initGame();
   }
 
   ngOnDestroy() {
-    if (this.dropInterval) clearInterval(this.dropInterval);
+    if (this.gameInterval) clearInterval(this.gameInterval);
   }
 
-  @HostListener('window:keydown', ['$event'])
-  onKeyPress(event: KeyboardEvent) {
-    if (this.gameEnded || this.paused) return;
-
-    switch(event.code) {
-      case 'ArrowLeft': this.movePiece(-1, 0); break;
-      case 'ArrowRight': this.movePiece(1, 0); break;
-      case 'ArrowDown': this.movePiece(0, 1); break;
-      case 'ArrowUp': this.rotatePiece(); break;
-      case 'Space': this.hardDrop(); break;
-    }
-    event.preventDefault();
-  }
-
-  setupBoard() {
-    this.grid = [];
-    for(let y = 0; y < this.boardH; y++) {
-      this.grid[y] = [];
-      for(let x = 0; x < this.boardW; x++) {
-        this.grid[y][x] = '';
+  initGame() {
+    // Create empty board with null values (not empty strings)
+    this.board = [];
+    for(let y = 0; y < 20; y++) {
+      this.board[y] = [];
+      for(let x = 0; x < 10; x++) {
+        this.board[y][x] = null;
       }
     }
+
+    this.spawnPiece();
+    this.startGameLoop();
   }
 
-  spawnNewPiece() {
-    if (!this.nextPiece) {
-      this.nextPiece = this.getRandomPiece();
-    }
-
-    this.activePiece = this.nextPiece;
-    this.nextPiece = this.getRandomPiece();
-
-
-    this.activePiece.x = Math.floor(this.boardW / 2) - 1;
-    this.activePiece.y = 0;
-
-    if (this.checkCollision(this.activePiece, 0, 0)) {
-      this.gameEnded = true;
-      this.stopGameLoop();
-    }
-  }
-
-  getRandomPiece() {
-    const template = this.pieces[Math.floor(Math.random() * this.pieces.length)];
-    return {
-      blocks: template.blocks.map(row => [...row]),
-      color: template.color,
-      x: 0,
+  spawnPiece() {
+    const pieceType = this.pieces[Math.floor(Math.random() * this.pieces.length)];
+    this.currentPiece = {
+      blocks: pieceType.blocks,
+      color: pieceType.color,
+      x: 4,
       y: 0
     };
+
+    // Basic game over check
+    if (this.checkCollision(this.currentPiece, this.currentPiece.x, this.currentPiece.y)) {
+      this.gameOver = true;
+      clearInterval(this.gameInterval);
+    }
   }
 
   startGameLoop() {
-    this.dropInterval = setInterval(() => {
-      if (!this.paused && !this.gameEnded) {
-        this.gameStep();
+    this.gameInterval = setInterval(() => {
+      if (!this.paused && !this.gameOver) {
+        this.dropPiece();
       }
-    }, this.dropSpeed);
+    }, 800); // Fixed speed, no progression
   }
 
-  stopGameLoop() {
-    if (this.dropInterval) {
-      clearInterval(this.dropInterval);
+  @HostListener('window:keydown', ['$event'])
+  handleKeys(event: KeyboardEvent) {
+    if (this.gameOver || this.paused || !this.currentPiece) return;
+
+    switch(event.key) {
+      case 'ArrowLeft':
+        if (!this.checkCollision(this.currentPiece, this.currentPiece.x - 1, this.currentPiece.y)) {
+          this.currentPiece.x--;
+        }
+        break;
+      case 'ArrowRight':
+        if (!this.checkCollision(this.currentPiece, this.currentPiece.x + 1, this.currentPiece.y)) {
+          this.currentPiece.x++;
+        }
+        break;
+      case 'ArrowDown':
+        this.dropPiece();
+        break;
     }
   }
 
-  gameStep() {
-    if (!this.movePiece(0, 1)) {
-      this.lockPiece();
-      this.checkLines();
-      this.spawnNewPiece();
+  dropPiece() {
+    if (!this.currentPiece) return;
+
+    if (!this.checkCollision(this.currentPiece, this.currentPiece.x, this.currentPiece.y + 1)) {
+      this.currentPiece.y++;
+    } else {
+      // Piece can't move down, place it
+      this.placePiece();
+      this.clearLines();
+      this.spawnPiece();
     }
   }
 
-  movePiece(dx: number, dy: number): boolean {
-    if (!this.activePiece) return false;
-
-    if (!this.checkCollision(this.activePiece, dx, dy)) {
-      this.activePiece.x += dx;
-      this.activePiece.y += dy;
-      return true;
-    }
-    return false;
-  }
-
-  rotatePiece() {
-    if (!this.activePiece) return;
-
-    const rotated = this.rotateBlocks(this.activePiece.blocks);
-    const originalBlocks = this.activePiece.blocks;
-
-    this.activePiece.blocks = rotated;
-
-    if (this.checkCollision(this.activePiece, 0, 0)) {
-      this.activePiece.blocks = originalBlocks;
-    }
-  }
-
-  rotateBlocks(blocks: number[][]): number[][] {
-    const rows = blocks.length;
-    const cols = blocks[0].length;
-    const rotated = Array(cols).fill(0).map(() => Array(rows).fill(0));
-
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        rotated[c][rows - 1 - r] = blocks[r][c];
-      }
-    }
-    return rotated;
-  }
-
-  hardDrop() {
-    if (!this.activePiece) return;
-
-    let dropped = 0;
-    while (this.movePiece(0, 1)) {
-      dropped++;
-    }
-    this.score += dropped; // bonus points
-  }
-
-  checkCollision(piece: any, dx: number, dy: number): boolean {
-    for (let y = 0; y < piece.blocks.length; y++) {
-      for (let x = 0; x < piece.blocks[y].length; x++) {
+  // Basic collision detection - has some flaws but works
+  checkCollision(piece: any, newX: number, newY: number): boolean {
+    for(let y = 0; y < piece.blocks.length; y++) {
+      for(let x = 0; x < piece.blocks[y].length; x++) {
         if (piece.blocks[y][x]) {
-          const newX = piece.x + x + dx;
-          const newY = piece.y + y + dy;
+          const boardX = newX + x;
+          const boardY = newY + y;
 
-          if (newX < 0 || newX >= this.boardW ||
-              newY >= this.boardH ||
-              (newY >= 0 && this.grid[newY][newX])) {
+          // Check boundaries
+          if (boardX < 0 || boardX >= 10 || boardY >= 20) {
+            return true;
+          }
+
+          // Check existing pieces
+          if (boardY >= 0 && this.board[boardY][boardX] !== null) {
             return true;
           }
         }
@@ -376,73 +219,107 @@ export class AppComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  lockPiece() {
-    if (!this.activePiece) return;
+  placePiece() {
+    if (!this.currentPiece) return;
 
-    for (let y = 0; y < this.activePiece.blocks.length; y++) {
-      for (let x = 0; x < this.activePiece.blocks[y].length; x++) {
-        if (this.activePiece.blocks[y][x]) {
-          const boardX = this.activePiece.x + x;
-          const boardY = this.activePiece.y + y;
+    for(let y = 0; y < this.currentPiece.blocks.length; y++) {
+      for(let x = 0; x < this.currentPiece.blocks[y].length; x++) {
+        if (this.currentPiece.blocks[y][x]) {
+          const boardX = this.currentPiece.x + x;
+          const boardY = this.currentPiece.y + y;
 
-          if (boardY >= 0) {
-            this.grid[boardY][boardX] = this.activePiece.color;
+          if (boardY >= 0 && boardY < 20 && boardX >= 0 && boardX < 10) {
+            this.board[boardY][boardX] = this.currentPiece.color;
           }
         }
       }
     }
   }
 
-  checkLines() {
-    let lines = 0;
+  clearLines() {
+    let linesCleared = 0;
 
-    for (let y = this.boardH - 1; y >= 0; y--) {
+    // Check each row from bottom to top
+    for(let y = 19; y >= 0; y--) {
       let fullLine = true;
-      for (let x = 0; x < this.boardW; x++) {
-        if (!this.grid[y][x]) {
+      let filledCount = 0;
+
+      // Check if all cells in this row are filled (not null)
+      for(let x = 0; x < 10; x++) {
+        if (this.board[y][x] === null) {
           fullLine = false;
-          break;
+        } else {
+          filledCount++;
         }
       }
 
+      if (filledCount >= 8) {
+      }
+
       if (fullLine) {
-        this.grid.splice(y, 1);
-        this.grid.unshift(new Array(this.boardW).fill(''));
-        lines++;
+        this.board.splice(y, 1);
+        this.board.unshift(new Array(10).fill(null));
+        linesCleared++;
         y++;
       }
     }
 
-    if (lines > 0) {
-      this.linesCleared += lines;
-      this.score += lines * 100 * this.level;
-      this.level = Math.floor(this.linesCleared / 10) + 1;
-      this.updateSpeed();
+    // Tetris scoring system
+    if (linesCleared > 0) {
+      this.lines += linesCleared;
+
+      // Standard Tetris scoring
+      let points = 0;
+      switch(linesCleared) {
+        case 1: points = 40; break;    // Single
+        case 2: points = 100; break;   // Double
+        case 3: points = 300; break;   // Triple
+        case 4: points = 1200; break;  // Tetris
+        default: points = linesCleared * 40; break;
+      }
+
+      this.score += points;
     }
   }
 
-  updateSpeed() {
-    this.dropSpeed = Math.max(100, 1000 - (this.level - 1) * 100);
-    this.stopGameLoop();
-    this.startGameLoop();
-  }
-
-  pauseToggle() {
+  togglePause() {
     this.paused = !this.paused;
   }
 
   restart() {
-    this.stopGameLoop();
-    this.setupBoard();
-    this.activePiece = null;
-    this.nextPiece = null;
+    if (this.gameInterval) clearInterval(this.gameInterval);
+
     this.score = 0;
-    this.level = 1;
-    this.linesCleared = 0;
-    this.gameEnded = false;
+    this.lines = 0;
     this.paused = false;
-    this.dropSpeed = 1000;
-    this.spawnNewPiece();
-    this.startGameLoop();
+    this.gameOver = false;
+    this.currentPiece = null;
+
+    this.initGame();
+  }
+
+  // Method to combine board with current falling piece for display
+  getBoardWithPiece(): string[][] {
+    const displayBoard = this.board.map(row =>
+      row.map(cell => cell || '#333')
+    );
+
+    // Draw current piece on the display board
+    if (this.currentPiece && !this.gameOver) {
+      for(let y = 0; y < this.currentPiece.blocks.length; y++) {
+        for(let x = 0; x < this.currentPiece.blocks[y].length; x++) {
+          if (this.currentPiece.blocks[y][x]) {
+            const boardX = this.currentPiece.x + x;
+            const boardY = this.currentPiece.y + y;
+
+            if (boardY >= 0 && boardY < 20 && boardX >= 0 && boardX < 10) {
+              displayBoard[boardY][boardX] = this.currentPiece.color;
+            }
+          }
+        }
+      }
+    }
+
+    return displayBoard;
   }
 }
