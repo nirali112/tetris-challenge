@@ -1,0 +1,5 @@
+/* Styles is defined inline in component for faster development */
+
+* {
+  box-sizing: border-box;
+}

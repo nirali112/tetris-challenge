@@ -1,59 +1,57 @@
-# TetrisGame
+# Tetris Game
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.4.
+A classic Tetris implementation built with Angular and TypeScript for a coding challenge.
 
-## Development server
-
-To start a local development server, run:
+## How to Run
 
 ```bash
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open `http://localhost:4200` in your browser.
 
-## Code scaffolding
+## Game Controls
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **Arrow Keys**: Move and rotate pieces
+  - Left/Right: Move piece horizontally  
+  - Up: Rotate piece
+  - Down: Soft drop (faster fall)
+- **Spacebar**: Hard drop (instant drop)
+- **Pause/Resume**: Control game state
+- **Reset**: Start new game
 
-```bash
-ng generate component component-name
-```
+## Features
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- Classic Tetris gameplay with all 7 tetrominoes
+- Line clearing with scoring system
+- Next piece preview
+- Pause/resume functionality
+- Responsive game board
 
-```bash
-ng generate --help
-```
+## Technical Details
 
-## Building
+- **Framework**: Angular (standalone components)
+- **Language**: TypeScript
+- **Styling**: CSS with flexbox layout
+- **Game Logic**: Custom implementation with collision detection and piece rotation
 
-To build the project run:
+## Game Mechanics
 
-```bash
-ng build
-```
+- **Scoring**: 100 points per cleared line × current level
+- **Leveling**: Every 10 lines cleared increases level
+- **Speed**: Game speed increases with each level
+- **Game Over**: When pieces reach the top of the board
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Development Notes
 
-## Running unit tests
+Focused on core gameplay mechanics and clean code structure rather than advanced features.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Architecture
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The game uses a single component approach with:
+- Game state management in component properties
+- Keyboard event handling with Angular HostListener
+- Interval-based game loop for piece dropping
+- Matrix operations for piece rotation
+- Collision detection for movement validation
